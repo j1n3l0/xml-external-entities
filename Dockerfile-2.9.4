@@ -1,0 +1,17 @@
+# Testing xxe vulnerability
+# It looks like the installed package libxml2 is th ething with the vulnerability.
+# If we build it from source from "https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.4.tar.xz"
+# we do not see the vulnerability.
+
+# requirements
+FROM debian:10
+
+RUN <<EOF
+apt-get update
+apt-get install -y libxml-libxml-perl
+EOF
+
+# test
+WORKDIR /app
+COPY . /app
+CMD ["./test.pl"]

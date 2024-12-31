@@ -1,0 +1,32 @@
+# Testing xxe vulnerability
+
+# requirements
+FROM debian:10
+
+RUN <<EOF
+apt-get update
+apt-get install -y build-essential cpanminus curl pkg-config python3.7-dev xz-utils
+apt-get purge -y libxml2
+cpanm -nq App::cpm
+EOF
+
+# install specific version of libxml2 (2.13.5)
+RUN <<EOF
+cd /tmp
+curl -LO https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.5.tar.xz
+tar -xf libxml2-2.13.5.tar.xz
+cd libxml2-2.13.5
+./configure --prefix=/usr
+make
+make install
+EOF
+
+# install the perl dependencies
+RUN <<EOF
+cpm install -g --show-build-log-on-failure XML::LibXML
+EOF
+
+# test
+WORKDIR /app
+COPY . /app
+CMD ["./test.pl"]
